@@ -1,0 +1,52 @@
+---
+
+- hosts: localhost
+  tasks:
+    - name: Install GitlabCI Multi Runner Repo
+      yum_repository:
+        name: runner_gitlab-ci-multi-runner
+        description: GitlabCI Multi Runner
+        baseurl: https://packages.gitlab.com/runner/gitlab-ci-multi-runner/el/7/$basearch
+        gpgkey: https://packages.gitlab.com/runner/gitlab-ci-multi-runner/gpgkey
+        gpgcheck: no
+        repo_gpgcheck: yes
+        enabled: yes
+        metadata_expire: 300
+
+    - name: Install GitlabCI Multi Runner Source Repo
+      yum_repository:
+        name: runner_gitlab-ci-multi-runner-source
+        description: GitlabCI Multi Runner
+        baseurl: https://packages.gitlab.com/runner/gitlab-ci-multi-runner/el/7/SRPMS
+        gpgcheck: no
+        repo_gpgcheck: yes
+        sslverify: yes
+        enabled: yes
+        gpgkey: https://packages.gitlab.com/runner/gitlab-ci-multi-runner/gpgkey
+        sslcacert: /etc/pki/tls/certs/ca-bundle.crt
+        metadata_expire: 300
+
+    - name: Install Docker Repo
+      yum_repository:
+        name: docker-ce-stable
+        description: Docker CE Stable
+        baseurl: https://download.docker.com/linux/centos/7/$basearch/stable
+        enabled: yes
+        gpgcheck: yes
+        gpgkey: https://download.docker.com/linux/centos/gpg
+
+    - name: Install Docker
+      yum:
+        name: docker
+        state: latest
+      notify: Start Docker
+
+    - name: Start Docker
+      service:
+        name: docker
+        state: started
+
+    - name: Install gitlab-ci-multi-runner RPM
+      yum:
+        name: gitlab-ci-multi-runner
+        state: latest
